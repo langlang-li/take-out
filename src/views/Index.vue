@@ -47,24 +47,31 @@
       </MenuItem>
     </Menu>
     <router-view />
+    <!-- 购物车面板 -->
     <div class="shoppingPanel">
-      <div>￥0|另需配送费￥4元</div>
-      <div>￥20起送</div>
-      <div>
+      <div>￥{{totalPrice}}|另需配送费￥4元</div>
+      <div v-show="totalPrice<20">￥20起送</div>
+      <div v-show="totalPrice>=20">去结算</div>
+      <div class="shoppingicon" @click="shopcarShow = !shopcarShow">
         <Icon type="md-cart" />
+      </div>
+      <div v-show="shopcarShow" class="divlocation">
+        <shopcar></shopcar>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import shopcar from "./Shopcar";
 import { getSeller } from "../api/apis";
 export default {
   data() {
     return {
+      shopcarShow: false,
       theme1: "light",
       data: [],
-      length: 0
+      length: 0,
     };
   },
   created() {
@@ -72,6 +79,14 @@ export default {
       this.data = res.data.data;
       this.length = this.data.supports.length;
     });
+  },
+  components: {
+    shopcar
+  },
+  computed: {
+    totalPrice() {
+      return this.$store.state.totalPrice;
+    }
   }
 };
 </script>
@@ -163,6 +178,26 @@ body {
     width: 100%;
     position: fixed;
     bottom: 0;
+    .shoppingicon {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background-color: #2a353a;
+      top: -10px;
+      left: 45px;
+      border-radius: 25px;
+      text-align: center;
+      line-height: 50px;
+      font-size: 30px;
+      z-index: 20;
+    }
+    .divlocation{
+        width: 100%;
+        position: absolute;
+        bottom: 50px;
+        left: 0;
+        z-index: 10;
+    }
     div {
       &:nth-child(1) {
         padding-left: 100px;
@@ -172,19 +207,12 @@ body {
       &:nth-child(2) {
         width: 30%;
         background-color: #2a353a;
-                text-align: center;
+        text-align: center;
       }
       &:nth-child(3) {
-        position:absolute;
-        width: 50px;
-        height: 50px;
+        width: 30%;
         background-color: #2a353a;
-        top: -10px;
-        left: 45px;
-         border-radius: 25px;
-         text-align: center;
-         line-height: 50px;
-         font-size: 30px;
+        text-align: center;
       }
     }
   }
